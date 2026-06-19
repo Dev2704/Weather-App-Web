@@ -12,17 +12,6 @@ async function getWeather(city) {
         const cloudCover = data.current_condition[0].cloudcover;
         const windSpeed = data.current_condition[0].windspeedKmph;
 
-        /*
-        console.log("===== Weather =====\n");
-        console.log(` City: ${city}`);
-        console.log(` Temperature: ${temp}°C`);
-        console.log(` Feels Like: ${feelsLike}°C`);
-        console.log(` Humidity: ${humidity}%`);
-        console.log(` Cloud Cover: ${cloudCover}%`);
-        console.log(` Wind Speed: ${windSpeed}kmph\n`);
-        console.log("==================");
-        */
-
         return {
         city,
         temp,
@@ -30,11 +19,12 @@ async function getWeather(city) {
         humidity,
         cloudCover,
         windSpeed
-    };
+        };
+
     }
 
     catch (error){
-        console.log("Could not fetch weather data.");
+        result.innerHTML = "Could not fetch weather data.";
         console.log(error.message);
     }
 }
@@ -43,18 +33,38 @@ const input = document.getElementById("cityInput");
 const result = document.getElementById("result")
 
 const button = document.getElementById("getWeather");
-button.addEventListener("click", async () => {
 
+async function weatherGet() {
     const formattedCity =
             input.value.charAt(0).toUpperCase() +
             input.value.slice(1).toLowerCase();
+    
+    if (input.value.trim() === ""){
+        result.innerHTML = "⚠️Please Enter a City";
+        return;
+    } else{
+        result.innerHTML = "🌥️Loading Weather...";
 
-    const weather = await getWeather(formattedCity);
-    result.innerHTML = 
-    ` City: ${weather.city} <br>
-    Temperature: ${weather.temp}°C <br>
-    Feels Like: ${weather.feelsLike}°C <br>
-    Humidity: ${weather.humidity}% <br>
-    Cloud Cover: ${weather.cloudCover}% <br> 
-    Wind Speed: ${weather.windSpeed}kmph\n`;
-});
+        const weather = await getWeather(formattedCity);
+
+        input.value = "";
+
+        result.innerHTML = 
+            ` 📍City: ${weather.city} <br>
+            🌡️Temperature: ${weather.temp}°C <br>
+            ♨️Feels Like: ${weather.feelsLike}°C <br>
+            💧Humidity: ${weather.humidity}% <br>
+            ☁️Cloud Cover: ${weather.cloudCover}% <br> 
+            💨Wind Speed: ${weather.windSpeed}kmph\n`;
+
+    }
+    
+}
+
+input.addEventListener("keypress", (event) =>{
+    if (event.key === "Enter") {
+        weatherGet();
+    }
+})
+
+button.addEventListener("click", weatherGet);
